@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>VueJS E-commerce Product Page</title>
+        <script src="https://unpkg.com/vue@3"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <h1>E-commerce Product Page</h1>
+
+            <!-- Table of products -->
+            <h3>Products</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="product in products" :key="product.id">
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.description }}</td>
+                        <td>${{ parseFloat(product.amount).toFixed(2) }}</td>
+                        <td>
+                            <button @click="addToCart(product)">Add to Cart</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Table of products in customer's cart -->
+            <h3>Your Cart</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(cartItem, index) in cart" :key="index">
+                        <td>{{ cartItem.name }}</td>
+                        <td>{{ cartItem.description }}</td>
+                        <td>${{ parseFloat(cartItem.amount).toFixed(2) }}</td>
+                        <td>
+                            <button @click="removeFromCart(index)">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Cart summary -->
+            <h3>Total: ${{ totalAmount.toFixed(2) }}</h3>
+        </div>
+
+        <script>
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        products: [
+                            { id: 1, name: "Earphone", description: "High-quality wireless earphones", amount: 20.5 },
+                            { id: 2, name: "Computer", description: "Desktop computer", amount: 500.99 },
+                            { id: 3, name: "Watch", description: "Smartwatch ", amount: 50.99 },
+                        ],
+                        cart: []
+                    };
+                },
+                methods: {
+                    addToCart(product) {
+                        this.cart.push(product);
+                    },
+                    removeFromCart(index) {
+                        this.cart.splice(index, 1);
+                    }
+                },
+                computed: {
+                    totalAmount() {
+                        return this.cart.reduce((total, product) => total + parseFloat(product.amount), 0);
+                    }
+                }
+            });
+
+            app.mount('#app');
+        </script>
+    </body>
+</html>

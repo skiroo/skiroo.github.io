@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VueJS Recipe Manager</title>
+        <script src="https://unpkg.com/vue@3"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <h1>Recipe Manager</h1>
+            <div v-for="recipe in recipes" :key="recipe.id" class="recipe">
+                <h2>{{ recipe.title }}</h2>
+                <p>{{ recipe.description }}</p>
+                <button @click="toggleFavorite(recipe)">
+                    {{ recipe.isFavorite ? "Remove from Favorites" : "Add to Favorites" }}
+                </button>
+                <span v-if="recipe.isFavorite" class="favorite">Favorite</span>
+            </div>
+        </div>
+
+        <script>
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        recipes: [
+                            {
+                                id: 1,
+                                title: "Spaghetti Carbonara",
+                                description: "A classic Italian pasta dish with eggs, cheese, pancetta, and pepper.",
+                                isFavorite: false
+                            },
+
+                            {
+                                id: 2,
+                                title: "Chicken Curry",
+                                description: "A flavorful curry with tender chicken pieces and rich spices.",
+                                isFavorite: false
+                            },
+
+                            {
+                                id: 3,
+                                title: "Veggie Stir-fry",
+                                description: "A quick and healthy stir-fry with fresh vegetables and soy sauce.",
+                                isFavorite: false
+                            }
+                        ]
+                    };
+                },
+
+                methods: {
+                    toggleFavorite(recipe) {
+                        recipe.isFavorite = !recipe.isFavorite;
+                    }
+                }
+            });
+
+            app.mount("#app");
+        </script>
+    </body>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: rgb(247, 247, 247);
+        }
+
+        .recipe {
+            border: 1px solid rgb(221, 221, 221);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: rgb(255, 255, 255);
+        }
+
+        .favorite {
+            color: red;
+            font-weight: bold;
+        }
+        
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</html>

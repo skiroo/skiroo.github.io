@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VueJS Quiz App</title>
+    <script src="https://unpkg.com/vue@3"></script>
+</head>
+<body>
+    <div id="app">
+        <div v-if="!quizFinished">
+            <h1>Quiz App</h1>
+            <p>Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}</p>
+            <h2>{{ currentQuestion.question }}</h2>
+            <div>
+                <button v-for="(option, index) in currentQuestion.options" :key="index" @click="answerQuestion(index)">
+                    {{ option }}
+                </button>
+            </div>
+            <div>
+                <p>Time left: {{ timer }}s</p>
+            </div>
+        </div>
+
+        <div v-else>
+            <h1>Quiz Finished!</h1>
+            <p>Your score: {{ score }} / {{ questions.length }}</p>
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    questions: [
+                        {
+                            question: "What is the capital of France?",
+                            options: ["Paris", "London", "Berlin", "Madrid"],
+                            correctIndex: 0
+                        },
+
+                        {
+                            question: "What is 2 + 2?",
+                            options: ["3", "4", "5", "6"],
+                            correctIndex: 1
+                        },
+
+                        {
+                            question: "Who is the president of the United States?",
+                            options: ["Joe Biden", "Barack Obama", "Donald Trump", "George Bush"],
+                            correctIndex: 2
+                        }
+                    ],
+
+                    currentQuestionIndex: 0,
+                    score: 0,
+                    quizFinished: false,
+                    timer: 10,
+                    timerInterval: null
+                };
+            },
+
+            computed: {
+                currentQuestion() {
+                    return this.questions[this.currentQuestionIndex];
+                }
+            },
+
+            methods: {
+                answerQuestion(selectedIndex) {
+                    if (selectedIndex === this.currentQuestion.correctIndex) {
+                        this.score++;
+                    }
+                    this.nextQuestion();
+                },
+
+                nextQuestion() {
+                    if (this.currentQuestionIndex < this.questions.length - 1) {
+                        this.currentQuestionIndex++;
+                        this.resetTimer();
+                    } else {
+                        this.quizFinished = true;
+                        clearInterval(this.timerInterval);
+                    }
+                },
+
+                resetTimer() {
+                    this.timer = 10; // Reset timer to 10 seconds
+                    clearInterval(this.timerInterval);
+                    this.startTimer();
+                },
+
+                startTimer() {
+                    this.timerInterval = setInterval(() => {
+                        if (this.timer > 0) {
+                            this.timer--;
+                        } else {
+                            this.nextQuestion();
+                        }
+                    }, 1000);
+                }
+            },
+
+            mounted() {
+                this.startTimer();
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

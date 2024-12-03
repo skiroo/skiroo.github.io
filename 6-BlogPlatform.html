@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>VueJS Blog Platform</title>
+        <script src="https://unpkg.com/vue@3"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <h1>Blog Platform</h1>
+
+            <!-- Post List Component -->
+            <post-list :posts="posts" @edit-post="editPost" @delete-post="deletePost"></post-list>
+
+            <!-- Post Form Component -->
+            <post-form :post="currentPost" @save-post="savePost"></post-form>
+        </div>
+
+        <script>
+            // Post List Component
+            const PostList = {
+                props: ['posts'],
+
+                methods: {
+                    handleEdit(post) {
+                        this.$emit('edit-post', post);
+                    },
+
+                    handleDelete(post) {
+                        this.$emit('delete-post', post);
+                    }
+                },
+
+                template: `
+                    <div>
+                        <h2>Posts</h2>
+                        <ul>
+                            <li v-for="post in posts" :key="post.id">
+                                <h3>{{ post.title }}</h3>
+                                <p>{{ post.content }}</p>
+                                <button @click="handleEdit(post)">Edit</button>
+                                <button @click="handleDelete(post)">Delete</button>
+                            </li>
+                        </ul>
+                    </div>
+                `
+            };
+
+            // Post Form Component
+            const PostForm = {
+                props: ['post'],
+
+                data() {
+                    return {
+                        title: this.post ? this.post.title : '',
+                        content: this.post ? this.post.content : ''
+                    };
+                },
+
+                methods: {
+                    handleSave() {
+                        const newPost = { id: this.post ? this.post.id : Date.now(), title: this.title, content: this.content };
+                        this.$emit('save-post', newPost);
+                        this.title = '';
+                        this.content = '';
+                    }
+                },
+
+                template: `
+                    <div>
+                        <h2>{{ post ? 'Edit' : 'Create' }} Post</h2>
+                        <input v-model="title" placeholder="Post Title" />
+                        <textarea v-model="content" placeholder="Post Content"></textarea>
+                        <button @click="handleSave">{{ post ? 'Save Changes' : 'Create Post' }}</button>
+                    </div>
+                `
+            };
+
+            // Vue App
+            const app = Vue.createApp({
+                components: {
+                    PostList,
+                    PostForm
+                },
+
+                data() {
+                    return {
+                        posts: JSON.parse(localStorage.getItem('posts')) || [],
+                        currentPost: null
+                    };
+                },
+
+                methods: {
+                    savePost(post) {
+                        if (this.currentPost) {
+                            // Edit post
+                            const index = this.posts.findIndex(p => p.id === post.id);
+                            this.posts.splice(index, 1, post);
+                        } else {
+                            // Add new post
+                            this.posts.push(post);
+                        }
+                        this.currentPost = null;
+                        this.updateLocalStorage();
+                    },
+
+                    editPost(post) {
+                        this.currentPost = post;
+                    },
+
+                    deletePost(post) {
+                        this.posts = this.posts.filter(p => p.id !== post.id);
+                        this.updateLocalStorage();
+                    },
+                    
+                    updateLocalStorage() {
+                        localStorage.setItem('posts', JSON.stringify(this.posts));
+                    }
+                }
+            });
+
+            app.mount('#app');
+        </script>
+    </body>
+</html>

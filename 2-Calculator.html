@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Calculator Application</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    </head>
+
+    <body>
+        <div id="app" @keydown="handleKeyPress" tabindex="0">
+            <input type="text" v-model="display" placeholder="Type a number..." readonly />
+
+            <div>
+                <button v-on:click="append('1')">1</button>
+                <button v-on:click="append('2')">2</button>
+                <button v-on:click="append('3')">3</button>
+                <button v-on:click="append('+')">+</button>
+            </div>
+
+            <div>
+                <button v-on:click="append('4')">4</button>
+                <button v-on:click="append('5')">5</button>
+                <button v-on:click="append('6')">6</button>
+                <button v-on:click="append('-')">-</button>
+            </div>
+
+            <div>
+                <button v-on:click="append('7')">7</button>
+                <button v-on:click="append('8')">8</button>
+                <button v-on:click="append('9')">9</button>
+                <button v-on:click="append('*')">*</button>
+            </div>
+
+            <div>
+                <button v-on:click="append('0')">0</button>
+                <button v-on:click="clear">C</button>
+                <button v-on:click="calculate">=</button>
+                <button v-on:click="append('/')">/</button>
+            </div>
+            
+            <p>Result: {{ result }}</p>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+
+                data: {
+                    display: '',
+                    result: 0
+                },
+
+                methods: {
+                    append(value) {
+                        this.display += value;
+                    },
+
+                    clear() {
+                        this.display = '';
+                        this.result = 0;
+                    },
+
+                    calculate() {
+                        try {
+                            this.result = eval(this.display);
+                        } catch (e) {
+                            this.result = 'Error';
+                        }
+                    },
+
+                    handleKeyPress(event) {
+                        const key = event.key;
+
+                        if ('0123456789'.includes(key)) {
+                            this.append(key);
+                        } else if ('+-*/'.includes(key)) {
+                            this.append(key);
+                        } else if (key === 'Enter') {
+                            this.calculate();
+                        } else if (key === 'Backspace') {
+                            this.display = this.display.slice(0, -1);
+                        } else if (key === 'Escape') {
+                            this.clear();
+                        }
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

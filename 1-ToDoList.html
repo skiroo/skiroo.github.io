@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>VueJS To-Do List Application</title>
+        <script src="https://unpkg.com/vue@3"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <h1>To-Do List Application</h1>
+
+            <task-input @add-task="addTask"></task-input>
+            <task-list
+                :tasks="tasks"
+                @toggle-completed="toggleCompleted"
+                @delete-task="deleteTask">
+            </task-list>
+        </div>
+
+        <script>
+            // Task Input Component
+            const TaskInput = {
+                template: `
+                    <div>
+                        <input type="text" v-model="newTask" placeholder="Add a new task" @keyup.enter="submitTask"/>
+                        <button @click="submitTask">Add</button>
+                    </div>
+                `,
+
+                data() {
+                    return { newTask: '' };
+                },
+
+                methods: {
+                    submitTask() {
+                        if (this.newTask.trim() !== '') {
+                            this.$emit('add-task', this.newTask);
+                            this.newTask = '';
+                        } else {
+                            alert('Please enter a task.');
+                        }
+                    }
+                }
+            };
+
+            // Task List Component
+            const TaskList = {
+                props: ['tasks'],
+
+                template: `
+                    <ul class="task-list">
+                        <li v-for="(task, index) in tasks" :key="index">
+                            <div>
+                                <input type="checkbox" v-model="task.completed" @change="toggleCompleted(index)">
+                                <span :class="{ completed: task.completed }">{{ task.name }}</span>
+                            </div>
+                            <button @click="deleteTask(index)">Delete</button>
+                        </li>
+                    </ul>
+                `,
+
+                methods: {
+                    toggleCompleted(index) {
+                        this.$emit('toggle-completed', index);
+                    },
+                    deleteTask(index) {
+                        this.$emit('delete-task', index);
+                    }
+                }
+            };
+
+            // Main Vue Instance
+            const app = Vue.createApp({
+                
+                data() {
+                    return { tasks: [] };
+                },
+
+                created() {
+                    // Load tasks from localStorage
+                    const savedTasks = JSON.parse(localStorage.getItem('tasks'));
+                    if (savedTasks) {
+                        this.tasks = savedTasks;
+                    }
+                },
+
+                methods: {
+                    addTask(taskName) {
+                        this.tasks.push({ name: taskName, completed: false });
+                        this.saveTasks();
+                    },
+
+                    toggleCompleted(index) {
+                        this.saveTasks();
+                    },
+
+                    deleteTask(index) {
+                        this.tasks.splice(index, 1);
+                        this.saveTasks();
+                    },
+
+                    saveTasks() {
+                        // Save tasks to localStorage
+                        localStorage.setItem('tasks', JSON.stringify(this.tasks));
+                    }
+                }
+            });
+
+            app.component('task-input', TaskInput);
+            app.component('task-list', TaskList);
+
+            app.mount('#app');
+        </script>
+    </body>
+
+    <style>
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .task-list li {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</html>
